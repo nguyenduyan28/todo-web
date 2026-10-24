@@ -12,19 +12,19 @@ pub struct Project {
     tasks: Vec<Task>,
 }
 
-#[derive(Debug)]
+#[derive(Debug, Clone, PartialEq)]
 pub enum Status {
     ToDo,
     InProgress,
     Done,
 }
 
-#[derive(Debug)]
+#[derive(Debug, Clone, PartialEq)]
 pub struct Task {
-    title: String,
-    status: Status,
-    dead_line: Option<DateTimeUtc>,
-    sub_task: Vec<Task>,
+    pub title: String,
+    pub status: Status,
+    pub dead_line: Option<DateTimeUtc>,
+    pub sub_task: Vec<Task>,
 }
 
 impl Project {
@@ -33,6 +33,13 @@ impl Project {
             dead_line: dead_line,
             tasks: tasks,
         }
+    }
+    pub fn set_dead_line (&mut self, dead_line: Option<DateTimeUtc>) {
+        self.dead_line = dead_line;
+    }
+
+    pub fn set_tasks (&mut self, tasks: Vec<Task>) {
+        self.tasks = tasks;
     }
 }
 
@@ -51,8 +58,23 @@ mod tests {
         let time: Option<DateTimeUtc> = Some(Utc::now());
         let tasks: Vec<Task> = Vec::new();
         let project: Project = Project::new(time, tasks);
-        println!("project {:#?}", project);
         assert_eq!(project.dead_line, time);
         assert_eq!(project.tasks.len(), 0);
+    }
+
+    #[test]
+    fn set_tasks() {
+        let time: Option<DateTimeUtc> = Some(Utc::now());
+        let task1: Task = Task {
+            title: "learn rust".to_string(),
+            status: Status::ToDo,
+            dead_line: Some(Utc::now()),
+            sub_task: Vec::new(),
+        };
+        let mut project: Project = Project::new(time, Vec::new());
+        let tasks_copy = task1.clone();
+        let tasks: Vec<Task> = vec![tasks_copy];
+        project.set_tasks(tasks);
+        assert_eq!(project.tasks[0], task1)
     }
 }
