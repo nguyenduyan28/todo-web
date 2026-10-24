@@ -12,7 +12,7 @@ pub struct Project {
     tasks: Vec<Task>,
 }
 
-#[derive(Debug, Clone, PartialEq)]
+#[derive(Debug, Clone, PartialEq, Copy)]
 pub enum Status {
     ToDo,
     InProgress,
@@ -21,10 +21,10 @@ pub enum Status {
 
 #[derive(Debug, Clone, PartialEq)]
 pub struct Task {
-    pub title: String,
-    pub status: Status,
-    pub dead_line: Option<DateTimeUtc>,
-    pub sub_task: Vec<Task>,
+    title: String,
+    status: Status,
+    dead_line: Option<DateTimeUtc>,
+    sub_task: Vec<Task>,
 }
 
 impl Project {
@@ -38,8 +38,60 @@ impl Project {
         self.dead_line = dead_line;
     }
 
-    pub fn set_tasks (&mut self, tasks: Vec<Task>) {
-        self.tasks = tasks;
+    pub fn set_tasks (&mut self, tasks: &Vec<Task>) {
+        self.tasks = tasks.to_vec();
+    }
+
+    pub fn get_dead_line (&self) -> Option<DateTimeUtc> {
+        self.dead_line
+    }
+
+    pub fn get_task (&self) -> &Vec<Task> {
+        &self.tasks
+    }
+}
+
+impl Task {
+    pub fn new (title: String, status: Status, dead_line: Option<DateTimeUtc>, sub_task: Vec<Task>) -> Task {
+        Self {
+            title,
+            status,
+            dead_line,
+            sub_task
+        }
+    }
+    /// setter
+    pub fn set_title (&mut self, title: String) {
+        self.title = title;
+    }
+
+    pub fn set_status (&mut self, status: Status) {
+        self.status = status;
+    }
+
+    pub fn set_dead_line (&mut self, dead_line: Option<DateTimeUtc>) {
+        self.dead_line = dead_line;
+    }
+
+    pub fn set_sub_task (&mut self, sub_task: Vec<Task>) {
+        self.sub_task = sub_task;
+    }
+
+    /// getter
+    pub fn get_title (&self) -> &str {
+        &self.title
+    }
+
+    pub fn get_status (&self) -> &Status {
+        &self.status
+    }
+
+    pub fn get_dead_line (&self) -> &Option<DateTimeUtc> {
+        &self.dead_line
+    }
+
+    pub fn get_sub_task (&self) -> &Vec<Task> {
+        &self.sub_task
     }
 }
 
@@ -74,7 +126,9 @@ mod tests {
         let mut project: Project = Project::new(time, Vec::new());
         let tasks_copy = task1.clone();
         let tasks: Vec<Task> = vec![tasks_copy];
-        project.set_tasks(tasks);
-        assert_eq!(project.tasks[0], task1)
+        project.set_tasks(&tasks);
+        assert_eq!(project.tasks[0], task1);
+        let task_result = project.get_task();
+        assert_eq!(task_result.to_vec(), tasks);
     }
 }
